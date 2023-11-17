@@ -7,37 +7,29 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavHostController
 import com.wgg.shopassistant.util.BottomNavItem
 
 @Composable
 fun RowScope.AddItem(
-    screen: BottomNavItem
+    screen: BottomNavItem,
+    navController: NavHostController
 ) {
     NavigationBarItem(
-
         label = {
             Text(text = screen.title)
         },
-
-
         icon = {
             Icon(
                  screen.icon,
                 contentDescription = screen.title
             )
         },
-
-
         selected = true,
-
-
         alwaysShowLabel = true,
-
-
-        onClick = { /*TODO*/ },
-
-
+        onClick = {
+            navController.navigate(screen.title)
+                  },
         colors = NavigationBarItemDefaults.colors()
     )
 }
@@ -45,7 +37,7 @@ fun RowScope.AddItem(
 
 
 @Composable
-fun BottomNavigation() {
+fun BottomNavigation( navController: NavHostController) {
 
     val items = listOf(
         BottomNavItem.Agregar,
@@ -58,7 +50,8 @@ fun BottomNavigation() {
     NavigationBar {
         items.forEach { item ->
             AddItem(
-                screen = item
+                screen = item,
+                navController = navController
             )
         }
     }

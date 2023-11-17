@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.wilber_p1_ap2"
+    namespace = "com.wgg.shopassistant"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.wilber_p1_ap2"
+        applicationId = "com.wgg.shopassistant"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
