@@ -1,5 +1,6 @@
 package com.wgg.shopassistant
 
+import ajustesScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -106,7 +107,7 @@ class MainActivity : ComponentActivity() {
                                     klk()
                                 }
                                 composable("ajustes") {
-                                    klk()
+                                    ajustesScreen()
                                 }
                             }
                         }
