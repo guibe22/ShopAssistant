@@ -15,15 +15,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.twotone.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +38,7 @@ import com.wgg.shopassistant.ui.navigation.BottomNavigation
 import com.wgg.shopassistant.ui.theme.ShopAssistantTheme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.wgg.shopassistant.ui.theme.NavigationDrawerSwitchThemeTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -41,11 +46,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ShopAssistantTheme {
-                // A surface container using the 'background' color from the theme
+
+            val isDarkTheme = rememberSaveable { mutableStateOf(false) }
+
+            NavigationDrawerSwitchThemeTheme(darkTheme = isDarkTheme.value) {
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
                     Scaffold(
@@ -55,28 +62,32 @@ class MainActivity : ComponentActivity() {
                         topBar = {
                             TopAppBar(
                                 title = {
-                                    Box(
+                                    NavigationBar(
                                         modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(Color.Transparent),
-                                        contentAlignment = Alignment.Center
+                                            .fillMaxWidth()
                                     ) {
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            modifier = Modifier.fillMaxWidth()
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .fillMaxWidth(),
+                                            contentAlignment = Alignment.Center
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.Default.ShoppingCart,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text(
-                                                text = "Shop Assistant",
-                                                color = MaterialTheme.colorScheme.primary
-                                            )
-                                        }
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.TwoTone.ShoppingCart,
+                                                    contentDescription = null
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    text = "Shop Assistant",
+                                                    color = MaterialTheme.colorScheme.primary
+                                                )
+                                            }
 
+                                        }
                                     }
                                 }
                             )
@@ -107,7 +118,7 @@ class MainActivity : ComponentActivity() {
                                     klk()
                                 }
                                 composable("ajustes") {
-                                    ajustesScreen()
+                                    ajustesScreen(isDarkTheme)
                                 }
                             }
                         }

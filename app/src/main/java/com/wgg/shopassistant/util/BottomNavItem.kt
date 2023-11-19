@@ -5,6 +5,10 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.twotone.AddCircle
+import androidx.compose.material.icons.twotone.DateRange
+import androidx.compose.material.icons.twotone.List
+import androidx.compose.material.icons.twotone.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class BottomNavItem(
@@ -14,24 +18,24 @@ sealed class BottomNavItem(
     object Agregar :
         BottomNavItem(
             "Agregar",
-            Icons.Default.AddCircle
+            Icons.TwoTone.AddCircle
         )
 
     object List :
         BottomNavItem(
             "Lista",
-            Icons.Default.List
+            Icons.TwoTone.List
         )
 
     object Planificar :
         BottomNavItem(
             "Planificar",
-            Icons.Default.DateRange
+            Icons.TwoTone.DateRange
         )
 
     object Ajustes :
         BottomNavItem(
             "Ajustes",
-            Icons.Default.Settings
+            Icons.TwoTone.Settings
         )
 }
