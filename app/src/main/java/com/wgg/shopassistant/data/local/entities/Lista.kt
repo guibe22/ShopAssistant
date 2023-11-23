@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "listas")
-data class lista (
+data class Lista (
     @PrimaryKey(autoGenerate = true)
     val listaId: Int? =null,
     val fecha: String,

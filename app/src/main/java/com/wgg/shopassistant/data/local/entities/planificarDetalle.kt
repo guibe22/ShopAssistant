@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "planificarDetalle", foreignKeys = [ForeignKey(entity = lista::class, parentColumns = ["planificarId"], childColumns = ["planificarId"], onDelete = ForeignKey.CASCADE)])
+@Entity(tableName = "planificarDetalle", foreignKeys = [ForeignKey(entity = planificar::class, parentColumns = ["planificarId"], childColumns = ["planificarId"], onDelete = ForeignKey.CASCADE)])
 class planificarDetalle(
     @PrimaryKey(autoGenerate = true)
     val planificarDetalleId :Int?=null,

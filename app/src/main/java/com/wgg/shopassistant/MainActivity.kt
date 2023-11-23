@@ -33,8 +33,11 @@ import androidx.navigation.compose.rememberNavController
 import com.wgg.shopassistant.ui.navigation.BottomNavigation
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.wgg.shopassistant.ui.listas.AgregarScreen
 import com.wgg.shopassistant.ui.theme.NavigationDrawerSwitchThemeTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     @OptIn(ExperimentalMaterial3Api::class)
@@ -95,10 +98,11 @@ class MainActivity : ComponentActivity() {
                                 startDestination = "bottomNavHost"
                             ) {
                                 composable("bottomNavHost") {
-                                    Klk()
+                                    AgregarScreen()
+
                                 }
                                 composable("agregar") {
-                                    Klk2()
+                                    AgregarScreen()
 
                                 }
                                 composable("lista") {
