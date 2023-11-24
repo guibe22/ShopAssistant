@@ -1,15 +1,22 @@
 package com.wgg.shopassistant.ui.listas
 
+import androidx.compose.animation.Animatable
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,13 +49,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.wgg.shopassistant.data.local.entities.ListaDetalle
 import com.wgg.shopassistant.util.TextBox
+import  androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.graphicsLayer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,9 +96,12 @@ fun AgregarScreen(
             item {
                 Registro(viewModel)
             }
-                items(items = listaDetalle, itemContent = { detalle ->
-                    CardDetalles(detalle = detalle)
-                })
+                items(
+                    items = listaDetalle.reversed(),
+                    itemContent = { detalle ->
+                        CardDetalles(detalle = detalle)
+                    }
+                )
             }
 
         }
@@ -93,72 +111,105 @@ fun AgregarScreen(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun Registro(viewModel:listasViewModel) {
+fun Registro(viewModel: listasViewModel) {
+    val fadeInAlpha = remember { Animatable(0f) }
 
-    TextBox(
-                    label = "Nombre",
-                    value =viewModel.nombre ,
-                    onValueChange = viewModel::onNombreChange,
-                    isError = viewModel.nombreError,
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Next,
-                    focusDirection = FocusDirection.Next
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                TextBox(
-                    label = "Precio",
-                    value =viewModel.precio ,
-                    onValueChange = viewModel::onPrecioChange,
-                    isError = viewModel.precioError,
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Next,
-                    focusDirection = FocusDirection.Next
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                TextBox(
-                    label = "Cantidad",
-                    value =viewModel.cantidad ,
-                    onValueChange = viewModel::onCantidadChange,
-                    isError = viewModel.cantidadError,
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done,
-                    focusDirection = FocusDirection.Exit
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                OutlinedButton(
-                    modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                    viewModel.agregarDetalle()
-                })
-    {
-        Icon(imageVector = Icons.Default.CheckCircle, contentDescription = "guardar")
-        Text(text = "Guardar")
+    LaunchedEffect(key1 = true) {
+        fadeInAlpha.animateTo(1f, animationSpec = tween(durationMillis = 500))
     }
+    Column(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxSize()
+            .graphicsLayer(alpha = fadeInAlpha.value)
+    ) {
+        TextBox(
+            label = "Nombre",
+            value = viewModel.nombre,
+            onValueChange = viewModel::onNombreChange,
+            isError = viewModel.nombreError,
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Next,
+            focusDirection = FocusDirection.Next
+        )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextBox(
+            label = "Precio",
+            value = viewModel.precio,
+            onValueChange = viewModel::onPrecioChange,
+            isError = viewModel.precioError,
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Next,
+            focusDirection = FocusDirection.Next
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextBox(
+            label = "Cantidad",
+            value = viewModel.cantidad,
+            onValueChange = viewModel::onCantidadChange,
+            isError = viewModel.cantidadError,
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Done,
+            focusDirection = FocusDirection.Exit ,
+            onDoneAction= { viewModel.agregarDetalle() }
+        )
+
+
+    }
 }
+
 
 @Composable
-fun CardDetalles(detalle: ListaDetalle){
-
-Card {
-    Text(text = detalle.nombre)
-    Spacer(modifier = Modifier.height(16.dp))
-    Text(text ="Cantidad: " +detalle.cantidad.toString())
-    Spacer(modifier = Modifier.height(16.dp))
-    Text(text ="Precio: " +detalle.precio.toString())
-    Spacer(modifier = Modifier.height(16.dp))
-    Text(text ="Total: " +detalle.total.toString())
+fun CardDetalles(detalle: ListaDetalle) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = detalle.nombre,
+                style = TextStyle(
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            DetalleItem("Cantidad", detalle.cantidad.toString())
+            DetalleItem("Precio", detalle.precio.toString())
+            DetalleItem("Total", detalle.total.toString())
+        }
+    }
 }
-}
-
-
-
-@Preview
 @Composable
-fun AgregarScreenPreview(){
-    AgregarScreen()
+fun DetalleItem(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Text(
+            text = label + ":",
+            modifier = Modifier
+                .weight(1f)
+                .wrapContentWidth(Alignment.Start),
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = value,
+            modifier = Modifier
+                .weight(1f)
+                .wrapContentWidth(Alignment.End)
+        )
+    }
 }
+
+

@@ -18,32 +18,37 @@ import androidx.compose.ui.text.input.KeyboardType
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextBox(
-    label:String,
+    label: String,
     value: String,
-    onValueChange:(String)->Unit,
-    isError:Boolean,
+    onValueChange: (String) -> Unit,
+    isError: Boolean,
     keyboardType: KeyboardType,
     imeAction: ImeAction,
-    focusDirection: FocusDirection
-){
-
+    focusDirection: FocusDirection,
+    onImeActionPerformed: () -> Unit = {},
+    onDoneAction: () -> Unit = {}
+) {
     val focusManager = LocalFocusManager.current
+
     TextField(
         modifier = Modifier.fillMaxWidth(),
-        label = { Text(text = label) } ,
+        label = { Text(text = label) },
         singleLine = true,
-        maxLines=1,
-        value =  value,
-        onValueChange =  onValueChange,
+        maxLines = 1,
+        value = value,
+        onValueChange = onValueChange,
         isError = isError,
         keyboardOptions = KeyboardOptions(
-            keyboardType =  keyboardType,
+            keyboardType = keyboardType,
             imeAction = imeAction,
             capitalization = KeyboardCapitalization.Words
         ),
-        keyboardActions = KeyboardActions{
-            focusManager.moveFocus(focusDirection)
-
-        }
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onImeActionPerformed.invoke()
+                focusManager.clearFocus()
+                onDoneAction()
+            }
+        )
     )
 }
