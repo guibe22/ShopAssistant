@@ -5,19 +5,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.wgg.shopassistant.data.local.entities.Lista
+import com.wgg.shopassistant.data.local.entities.ListaConDetalles
 import com.wgg.shopassistant.data.local.entities.ListaDetalle
 import com.wgg.shopassistant.data.repository.ListaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 @HiltViewModel
 class listasViewModel@Inject constructor(
     private val repository: ListaRepository
 ) : ViewModel() {
 
-    var fecha  by mutableStateOf("")
     var totalPrecio by mutableStateOf("0")
     var totalProductos by mutableStateOf("0")
 
@@ -53,8 +58,36 @@ class listasViewModel@Inject constructor(
     private val _listaDetalle = MutableStateFlow(mutableListOf<ListaDetalle>())
     val listaDetalle = _listaDetalle.asStateFlow()
 
+    val litas: StateFlow<List<ListaConDetalles>> = repository.getListas()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
+
+    fun save(){
+        if(listaDetalle.value.isNullOrEmpty()){
+            return
+        }
+        viewModelScope.launch {
+            val lista = Lista(
+                fecha= LocalDate.now().toString(),
+                totalProductos = totalProductos.toInt(),
+                totalPrecio = totalPrecio.toDouble()
+            )
+            repository.saveLista(lista, listaDetalle.value)
+            totalProductos=""
+            totalPrecio=""
+            _listaDetalle.value = emptyList<ListaDetalle>().toMutableList()
+
+        }
+    }
+
 
     fun agregarDetalle() {
+        if(ValidarDetalle()){
+            return
+        }
 
         viewModelScope.launch {
 
@@ -76,25 +109,46 @@ class listasViewModel@Inject constructor(
             totalPrecioInt = (_listaDetalle.value.sumOf { it.total } ?: 0.0)
             totalProductosInt = _listaDetalle.value.sumOf { it.cantidad }
             totalPrecio= totalPrecioInt.toString()
-            totalProductos= totalPrecioInt.toString()
+            totalProductos=  totalProductosInt.toString()
+            LimpiarDetalle()
 
 
         }
-        fun eliminarDetalle(detalle: ListaDetalle) {
-            viewModelScope.launch {
-                _listaDetalle.value = _listaDetalle.value.toMutableList().apply {
-                    remove(detalle)
-                }
-                var totalPrecioInt by mutableStateOf(0.0)
-                var totalProductosInt by mutableStateOf(0)
 
-                totalPrecioInt = (_listaDetalle.value.sumOf { it.total } ?: 0.0)
-                totalProductosInt = _listaDetalle.value.sumOf { it.cantidad }
-                totalPrecio= totalPrecioInt.toString()
-                totalProductos= totalPrecioInt.toString()
-
+    }
+    fun eliminarDetalle(detalle: ListaDetalle) {
+        viewModelScope.launch {
+            _listaDetalle.value = _listaDetalle.value.toMutableList().apply {
+                remove(detalle)
             }
+            var totalPrecioInt by mutableStateOf(0.0)
+            var totalProductosInt by mutableStateOf(0)
+
+            totalPrecioInt = (_listaDetalle.value.sumOf { it.total } ?: 0.0)
+            totalProductosInt = _listaDetalle.value.sumOf { it.cantidad }
+            totalPrecio= totalPrecioInt.toString()
+            totalProductos=  totalProductosInt.toString()
+
         }
     }
+
+    fun LimpiarDetalle() {
+        nombre = ""
+        precio = ""
+        cantidad = ""
+        total = ""
+        nombreError =false
+        precioError =false
+        cantidadError =false
+        totalError =false
+    }
+    fun ValidarDetalle():Boolean {
+        onNombreChange(nombre)
+        onPrecioChange(precio)
+        onCantidadChange(cantidad)
+
+        return nombreError || precioError || cantidadError
+    }
+
 
 }

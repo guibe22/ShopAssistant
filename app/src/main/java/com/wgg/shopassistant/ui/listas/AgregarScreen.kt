@@ -1,14 +1,5 @@
 package com.wgg.shopassistant.ui.listas
 
-import androidx.compose.animation.Animatable
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,41 +10,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonElevation
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,9 +39,14 @@ import com.wgg.shopassistant.data.local.entities.ListaDetalle
 import com.wgg.shopassistant.util.TextBox
 import  androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.width
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.graphicsLayer
+import com.wgg.shopassistant.data.local.entities.Lista
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,12 +54,18 @@ fun AgregarScreen(
     viewModel: listasViewModel = hiltViewModel()
 ){
     val listaDetalle by viewModel.listaDetalle.collectAsState()
+
+
+    val mostrarRegistro = remember { mutableStateOf(false) }
+
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { /* Tus acciones */ }) {
+            FloatingActionButton(onClick = {
+                mostrarRegistro.value = !mostrarRegistro.value
+            }) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Crear nota"
+                    contentDescription = ""
                 )
             }
         },
@@ -86,33 +75,49 @@ fun AgregarScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
-                .padding(8.dp)
         ) {
 
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-            item {
-                Registro(viewModel)
-            }
+                item {
+                    listaView(viewModel)
+                }
+                item{
+                    if (mostrarRegistro.value) {
+                        Registro(viewModel,  mostrarRegistro)
+                    } else {
+                        Button(
+                            onClick = {
+                                viewModel.save()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        ) {
+                            Text(text = "Finalizar")
+                        }
+                    }
+
+                }
                 items(
                     items = listaDetalle.reversed(),
                     itemContent = { detalle ->
-                        CardDetalles(detalle = detalle)
+                        CardDetalles(detalle = detalle, viewModel)
                     }
                 )
             }
-
         }
-        }
+    }
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun Registro(viewModel: listasViewModel) {
+fun Registro(viewModel: listasViewModel,  mostrarRegistro: MutableState<Boolean>) {
     val fadeInAlpha = remember { Animatable(0f) }
+
 
     LaunchedEffect(key1 = true) {
         fadeInAlpha.animateTo(1f, animationSpec = tween(durationMillis = 500))
@@ -155,20 +160,51 @@ fun Registro(viewModel: listasViewModel) {
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Done,
             focusDirection = FocusDirection.Exit ,
-            onDoneAction= { viewModel.agregarDetalle() }
+            onDoneAction= {
+                viewModel.agregarDetalle()
+                mostrarRegistro.value = !mostrarRegistro.value
+            }
         )
 
 
     }
 }
 
-
 @Composable
-fun CardDetalles(detalle: ListaDetalle) {
+fun listaView(viewModel: listasViewModel){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Text(
+            text = "Total: " +viewModel.totalPrecio,
+            modifier = Modifier
+                .weight(1f)
+                .wrapContentWidth(Alignment.Start),
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text =  "Cantidad: " +viewModel.totalProductos,
+            modifier = Modifier
+                .weight(1f)
+                .wrapContentWidth(Alignment.End),
+            fontWeight = FontWeight.Bold
+        )
+    }
+
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CardDetalles(detalle: ListaDetalle, viewModel: listasViewModel) {
+    val openDialog = remember { mutableStateOf(false) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
+            onClick = { openDialog.value=true },
     ) {
         Column(
             modifier = Modifier
@@ -188,6 +224,12 @@ fun CardDetalles(detalle: ListaDetalle) {
             DetalleItem("Total", detalle.total.toString())
         }
     }
+    AlertDialogSample(
+        OnClick= { viewModel.eliminarDetalle(detalle) },
+        title = "Eliminar?",
+        content = "este producto se eliminara del listado",
+        openDialog=openDialog
+    )
 }
 @Composable
 fun DetalleItem(label: String, value: String) {
@@ -197,7 +239,7 @@ fun DetalleItem(label: String, value: String) {
             .padding(vertical = 4.dp)
     ) {
         Text(
-            text = label + ":",
+            text = "$label:",
             modifier = Modifier
                 .weight(1f)
                 .wrapContentWidth(Alignment.Start),
@@ -208,6 +250,51 @@ fun DetalleItem(label: String, value: String) {
             modifier = Modifier
                 .weight(1f)
                 .wrapContentWidth(Alignment.End)
+        )
+    }
+
+
+}
+@Composable
+fun AlertDialogSample(
+    OnClick: () -> Unit = {},
+    title:String,
+    content:String,
+    openDialog: MutableState<Boolean>,
+) {
+
+
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+
+                openDialog.value = false
+            },
+            title = {
+                Text(text = title)
+            },
+            text = {
+                Text(text = content)
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        openDialog.value = false
+                        OnClick()
+                    }
+                ) {
+                    Text("SI")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        openDialog.value = false
+                    }
+                ) {
+                    Text("NO")
+                }
+            }
         )
     }
 }
