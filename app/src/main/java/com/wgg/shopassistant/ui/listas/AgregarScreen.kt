@@ -189,7 +189,7 @@ fun Registro(viewModel: listasViewModel, mostrarRegistro: MutableState<Boolean>)
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp).alpha(if (currentStep >= 0) 1f else 0f))
 
         Box(
             modifier = Modifier
@@ -211,7 +211,7 @@ fun Registro(viewModel: listasViewModel, mostrarRegistro: MutableState<Boolean>)
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp).alpha(if (currentStep >= 1) 1f else 0f))
 
         Box(
             modifier = Modifier
@@ -229,6 +229,7 @@ fun Registro(viewModel: listasViewModel, mostrarRegistro: MutableState<Boolean>)
                     .alpha(if (currentStep >= 2) 1f else 0f)
                     .fillMaxWidth() ,
                 onDoneAction = {
+                    if(viewModel.ValidarDetalle()){ return@TextBox}
                     viewModel.agregarDetalle()
                     mostrarRegistro.value = !mostrarRegistro.value
                 }
