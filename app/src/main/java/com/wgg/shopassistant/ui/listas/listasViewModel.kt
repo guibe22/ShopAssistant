@@ -82,6 +82,11 @@ class listasViewModel@Inject constructor(
 
         }
     }
+    fun delete(Id:Int){
+        viewModelScope.launch {
+            repository.deleteLista(Id)
+        }
+    }
 
 
     fun agregarDetalle() {

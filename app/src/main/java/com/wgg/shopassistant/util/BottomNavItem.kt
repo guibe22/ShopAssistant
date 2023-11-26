@@ -27,12 +27,6 @@ sealed class BottomNavItem(
             Icons.TwoTone.List
         )
 
-    object Planificar :
-        BottomNavItem(
-            "Planificar",
-            Icons.TwoTone.DateRange
-        )
-
     object Ajustes :
         BottomNavItem(
             "Ajustes",

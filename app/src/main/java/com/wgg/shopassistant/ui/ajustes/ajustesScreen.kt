@@ -1,3 +1,4 @@
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Column
@@ -31,7 +32,7 @@ fun AjustesScreen(
     isDarkTheme: MutableState<Boolean>
 ) {
     val context = LocalContext.current
-
+    val activity = (LocalContext.current as? Activity)
     Column (
         modifier = Modifier.fillMaxWidth()
     ){
@@ -76,9 +77,10 @@ fun AjustesScreen(
         Spacer(modifier = Modifier.height(16.dp))
         NavigationDrawerItem(
             icon = { Icon(Icons.TwoTone.ExitToApp, contentDescription = null) },
-            label = { Text("Cerrar Sesión",color = MaterialTheme.colorScheme.primary) },
+            label = { Text("Salir",color = MaterialTheme.colorScheme.primary) },
             selected = false,
             onClick = {
+                activity?.finish()
             },
             modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )

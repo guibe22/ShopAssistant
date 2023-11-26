@@ -40,7 +40,6 @@ fun BottomNavigation( navController: NavHostController) {
     val items = listOf(
         BottomNavItem.Agregar,
         BottomNavItem.List,
-        BottomNavItem.Planificar,
         BottomNavItem.Ajustes
     )
 

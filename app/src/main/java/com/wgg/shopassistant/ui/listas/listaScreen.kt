@@ -37,11 +37,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.wgg.shopassistant.data.local.entities.ListaConDetalles
 import com.wgg.shopassistant.data.local.entities.ListaDetalle
+import com.wgg.shopassistant.util.AlertDialogSample
 import dagger.multibindings.ClassKey
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -57,24 +59,39 @@ fun ListaScreen(
                 .fillMaxSize()
                 .padding(it)
         ) {
-            items(
-                items = listas.reversed(),
-                itemContent = { listaConDetalles ->
-                    ListaItem(listaConDetalles)
+            if (listas.isEmpty()) {
+                item {
+                    Text(
+                        text = "Aún no has guardado nada. Comienza a registrar tus compras.",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        textAlign = TextAlign.Center
+                    )
                 }
-            )
+            } else {
+                items(
+                    items = listas.reversed(),
+                    itemContent = { listaConDetalles ->
+                        ListaItem(listaConDetalles,viewModel)
+                    }
+                )
+            }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListaItem(listaConDetalles: ListaConDetalles) {
+fun ListaItem(listaConDetalles: ListaConDetalles , viewModel: listasViewModel) {
     var detallesVisible by remember { mutableStateOf(false) }
+    val openDialog = remember { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
+        onClick = { openDialog.value=true }
     ) {
         Column(
             modifier = Modifier
@@ -138,6 +155,12 @@ fun ListaItem(listaConDetalles: ListaConDetalles) {
             }
         }
     }
+    AlertDialogSample(
+        OnClick= { listaConDetalles.lista.listaId?.let { viewModel.delete(it) } },
+        title = "Eliminar?",
+        content = "esta lista se eliminara permanentemente.",
+        openDialog=openDialog
+    )
 }
 
 

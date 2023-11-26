@@ -39,14 +39,24 @@ import com.wgg.shopassistant.data.local.entities.ListaDetalle
 import com.wgg.shopassistant.util.TextBox
 import  androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.style.TextAlign
 import com.wgg.shopassistant.data.local.entities.Lista
+import com.wgg.shopassistant.util.AlertDialogSample
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,15 +81,12 @@ fun AgregarScreen(
         },
         floatingActionButtonPosition = FabPosition.End
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it)
-        ) {
-
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(it),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 item {
                     listaView(viewModel)
@@ -88,18 +95,47 @@ fun AgregarScreen(
                     if (mostrarRegistro.value) {
                         Registro(viewModel,  mostrarRegistro)
                     } else {
-                        Button(
-                            onClick = {
-                                viewModel.save()
-                            },
+                        if(listaDetalle.isNotEmpty()){
+                            val openDialog = remember { mutableStateOf(false) }
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
                                 .padding(8.dp)
+                                .background(color = Color(0xFF4CAF50), shape = CircleShape),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text(text = "Finalizar")
+                            IconButton(
+                                onClick = {
+                                    openDialog.value= !openDialog.value
+                                },
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .size(56.dp)
+                                    .align(Alignment.Center)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null,
+                                    tint = Color.White, // White color for the icon
+                                    modifier = Modifier.size(32.dp) // Adjust the size of the icon as needed
+                                )
+                            }
                         }
+                            AlertDialogSample(
+                                OnClick= { viewModel.save() },
+                                title = "Guardar Lista?",
+                                content = "",
+                                openDialog=openDialog
+                            )
+                    }else{
+                            Text(
+                                text = "Comienza a agregar productos!",
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                textAlign = TextAlign.Center
+                            )
                     }
-
+                    }
                 }
                 items(
                     items = listaDetalle.reversed(),
@@ -110,7 +146,7 @@ fun AgregarScreen(
             }
         }
     }
-}
+
 
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -255,48 +291,6 @@ fun DetalleItem(label: String, value: String) {
 
 
 }
-@Composable
-fun AlertDialogSample(
-    OnClick: () -> Unit = {},
-    title:String,
-    content:String,
-    openDialog: MutableState<Boolean>,
-) {
 
-
-    if (openDialog.value) {
-        AlertDialog(
-            onDismissRequest = {
-
-                openDialog.value = false
-            },
-            title = {
-                Text(text = title)
-            },
-            text = {
-                Text(text = content)
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        openDialog.value = false
-                        OnClick()
-                    }
-                ) {
-                    Text("SI")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        openDialog.value = false
-                    }
-                ) {
-                    Text("NO")
-                }
-            }
-        )
-    }
-}
 
 

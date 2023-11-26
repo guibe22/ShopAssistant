@@ -48,8 +48,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
-            val isDarkTheme = rememberSaveable { mutableStateOf( true) }
+            val dark = isSystemInDarkTheme()
+            val isDarkTheme = rememberSaveable { mutableStateOf( dark) }
 
             NavigationDrawerSwitchThemeTheme(darkTheme = isDarkTheme.value) {
 
@@ -113,9 +113,6 @@ class MainActivity : ComponentActivity() {
                                     ListaScreen()
 
                                 }
-                                composable("planificar") {
-                                    Klk2()
-                                }
                                 composable("ajustes") {
                                     AjustesScreen(isDarkTheme)
                                 }
@@ -130,11 +127,3 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@Composable
-fun Klk(){
-    Text("klk jeffry")
-}
-@Composable
-fun Klk2(){
-    Text("klk vladi")
-}
