@@ -51,7 +51,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
@@ -151,58 +154,86 @@ fun AgregarScreen(
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun Registro(viewModel: listasViewModel,  mostrarRegistro: MutableState<Boolean>) {
+fun Registro(viewModel: listasViewModel, mostrarRegistro: MutableState<Boolean>) {
     val fadeInAlpha = remember { Animatable(0f) }
-
+    var currentStep by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(key1 = true) {
         fadeInAlpha.animateTo(1f, animationSpec = tween(durationMillis = 500))
     }
+
     Column(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxSize()
             .graphicsLayer(alpha = fadeInAlpha.value)
     ) {
-        TextBox(
-            label = "Nombre",
-            value = viewModel.nombre,
-            onValueChange = viewModel::onNombreChange,
-            isError = viewModel.nombreError,
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Next,
-            focusDirection = FocusDirection.Next
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextBox(
-            label = "Precio",
-            value = viewModel.precio,
-            onValueChange = viewModel::onPrecioChange,
-            isError = viewModel.precioError,
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Next,
-            focusDirection = FocusDirection.Next
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextBox(
-            label = "Cantidad",
-            value = viewModel.cantidad,
-            onValueChange = viewModel::onCantidadChange,
-            isError = viewModel.cantidadError,
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done,
-            focusDirection = FocusDirection.Exit ,
-            onDoneAction= {
-                viewModel.agregarDetalle()
-                mostrarRegistro.value = !mostrarRegistro.value
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            TextBox(
+                label = "Nombre",
+                value = viewModel.nombre,
+                onValueChange = viewModel::onNombreChange,
+                isError = viewModel.nombreError,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next,
+                modifier =Modifier
+                    .alpha(if (currentStep >= 0) 1f else 0f)
+                    .fillMaxWidth(),
+                focusDirection = FocusDirection.Next
+            ) {
+                // Move to the next step
+                currentStep++
             }
-        )
+        }
 
+        Spacer(modifier = Modifier.height(16.dp))
 
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            TextBox(
+                label = "Precio",
+                value = viewModel.precio,
+                onValueChange = viewModel::onPrecioChange,
+                isError = viewModel.precioError,
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next,
+                modifier =Modifier
+                    .alpha(if (currentStep >= 1) 1f else 0f)
+                    .fillMaxWidth(),
+                focusDirection = FocusDirection.Next
+            ) {
+                currentStep++
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            TextBox(
+                label = "Cantidad",
+                value = viewModel.cantidad,
+                onValueChange = viewModel::onCantidadChange,
+                isError = viewModel.cantidadError,
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+                focusDirection = FocusDirection.Exit ,
+                modifier =Modifier
+                    .alpha(if (currentStep >= 2) 1f else 0f)
+                    .fillMaxWidth() ,
+                onDoneAction = {
+                    viewModel.agregarDetalle()
+                    mostrarRegistro.value = !mostrarRegistro.value
+                }
+            )
+        }
     }
 }
 
